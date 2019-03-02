@@ -1,7 +1,7 @@
 FROM nginx
 
 RUN ls -la
-ADD nginx.conf /etc/nginx/nginx.conf
+ADD ./nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 
