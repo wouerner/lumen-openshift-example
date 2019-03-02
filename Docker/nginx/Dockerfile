@@ -1,5 +1,5 @@
 FROM nginx
-
+WORKDIR /app
 RUN ls -la
 ADD ./nginx.conf /etc/nginx/nginx.conf
 
