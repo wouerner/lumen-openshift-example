@@ -1,7 +1,6 @@
 FROM nginx
 WORKDIR /app
-RUN ls -la
-ADD ./nginx.conf /etc/nginx/nginx.conf
+ADD ./Docker/nginx/nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 
