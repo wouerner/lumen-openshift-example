@@ -1,3 +1,17 @@
+FROM composer:1.7 as vendor
+
+WORKDIR /app
+
+COPY . /app
+
+RUN composer install \
+    --ignore-platform-reqs \
+    --no-interaction \
+    --no-plugins \
+    --no-scripts \
+    --prefer-dist
+
+
 FROM php:7.2.5-fpm
 
 WORKDIR "/application"
@@ -47,3 +61,4 @@ RUN docker-php-ext-install mbstring pdo pdo_mysql \
     && docker-php-ext-enable sqlsrv pdo_sqlsrv xdebug
 
 COPY . /var/www/html
+COPY --from=vendor /app/vendor/ /var/www/html/vendor/
