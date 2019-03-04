@@ -36,6 +36,8 @@ RUN chgrp -R root /var/cache/nginx
 RUN sed -i.bak 's/^user/#user/' /etc/nginx/nginx.conf
 COPY --from=vendor /app/vendor/ /var/www/html/vendor/
 
+RUN chmod -R 777 /var/www/html/storage
+
 EXPOSE 8081
 RUN addgroup nginx root
 USER nginx
