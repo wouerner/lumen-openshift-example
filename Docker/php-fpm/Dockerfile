@@ -62,5 +62,8 @@ COPY . /var/www/html
 COPY --from=vendor /app/vendor/ /var/www/html/vendor/
 
 RUN chmod -R 777 /var/www/html/storage
+RUN chown -R www-data: /var/www/html
+
+COPY ./Docker/php-fpm/php-ini-overrides.ini /etc/php/7.2/fpm/conf.d/99-overrides.ini
 
 USER www-data
