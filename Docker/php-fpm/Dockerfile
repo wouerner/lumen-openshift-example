@@ -45,3 +45,5 @@ RUN apt-get update \
 RUN docker-php-ext-install mbstring pdo pdo_mysql \
     && pecl install sqlsrv pdo_sqlsrv xdebug \
     && docker-php-ext-enable sqlsrv pdo_sqlsrv xdebug
+
+COPY . /var/www/html
