@@ -20,7 +20,7 @@ RUN composer install \
 
 FROM nginx:mainline-alpine
 RUN ls -la
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY Docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY . /var/www/html
 

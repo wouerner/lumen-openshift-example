@@ -60,3 +60,5 @@ RUN docker-php-ext-install mbstring pdo pdo_mysql \
 
 COPY . /var/www/html
 COPY --from=vendor /app/vendor/ /var/www/html/vendor/
+
+RUN chmod -R 777 /var/www/html/storage
