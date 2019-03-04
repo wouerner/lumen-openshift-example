@@ -5,6 +5,18 @@
 
 #EXPOSE 80
 
+FROM composer:1.7 as vendor
+
+WORKDIR /app
+
+COPY . /app
+
+RUN composer install \
+    --ignore-platform-reqs \
+    --no-interaction \
+    --no-plugins \
+    --no-scripts \
+    --prefer-dist
 
 FROM nginx:mainline-alpine
 RUN ls -la
@@ -22,6 +34,7 @@ RUN chgrp -R root /var/cache/nginx
 
 # comment user directive as master process is run as user in OpenShift anyhow
 RUN sed -i.bak 's/^user/#user/' /etc/nginx/nginx.conf
+COPY --from=vendor /app/vendor/ /var/www/html/vendor/
 
 EXPOSE 8081
 RUN addgroup nginx root
