@@ -8,7 +8,7 @@
 
 FROM nginx:mainline-alpine
 RUN ls -la
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY . /var/www/html
 
