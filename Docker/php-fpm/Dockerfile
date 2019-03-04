@@ -14,8 +14,6 @@ RUN composer install \
 
 FROM php:7.2.5-fpm
 
-WORKDIR "/application"
-
 RUN apt-get update
 
 RUN echo "[ ***** ***** ***** ] - Installing each item in new command to use cache and avoid download again ***** ***** ***** "
