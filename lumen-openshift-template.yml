@@ -1,0 +1,177 @@
+kind: "Template"
+apiVersion: "v1"
+metadata:
+  name: lumen
+  annotations:
+    description: "Lumen Template Nginx and PHP-FPM"
+    tags: "php"
+objects:
+  - kind: Build
+    apiVersion: build.openshift.io/v1
+    metadata:
+      name: lumen-nginx
+      namespace: hkkk
+    spec:
+      nodeSelector: null
+      output:
+        to:
+          kind: ImageStreamTag
+          name: 'lumen-nginx:latest'
+      source:
+        git:
+          ref: master
+          uri: 'https://github.com/wouerner/lumen-openshift-example.git'
+        type: Git
+      strategy:
+        dockerStrategy:
+          dockerfilePath: Docker/nginx/Dockerfile
+        type: Docker
+      triggeredBy: null
+  - kind: Build
+    apiVersion: build.openshift.io/v1
+    metadata:
+      name: lumen-php
+      namespace: hkkk
+    spec:
+      nodeSelector: null
+      output:
+        to:
+          kind: ImageStreamTag
+          name: 'lumen-php:latest'
+        type: Git
+      source:
+        git:
+          ref: master
+          uri: 'https://github.com/wouerner/lumen-openshift-example.git'
+        type: Git
+      strategy:
+        dockerStrategy:
+          dockerfilePath: Docker/php-fpm/Dockerfile
+        type: Docker
+      triggeredBy: null
+  - kind: ImageStream
+    apiVersion: image.openshift.io/v1
+    metadata:
+      name: lumen-nginx
+      namespace: hkkk
+    spec:
+      lookupPolicy:
+        local: false
+  - kind: ImageStream
+    apiVersion: image.openshift.io/v1
+    metadata:
+      name: lumen-php
+      namespace: hkkk
+    spec:
+      lookupPolicy:
+        local: false
+  - kind: "DeploymentConfig"
+    apiVersion: v1
+    metadata:
+      name: "lumen-php"
+    spec:
+      template: 
+        metadata:
+          labels:
+            name: "lumen-php"
+        spec:
+          containers:
+            - name: "lumen-php"
+              image: "lumen-php"
+              ports:
+                - containerPort: 9000
+                  protocol: "TCP"
+      replicas: 1
+      triggers:
+      - type: "ConfigChange"
+      - type: "ImageChange"
+        imageChangeParams:
+          automatic: true
+          containerNames:
+            - "lumen-php"
+          from:
+            kind: "ImageStreamTag"
+            name: "lumen-php:latest"
+      strategy: 
+        type: "Rolling"
+      paused: false 
+      revisionHistoryLimit: 2 
+      minReadySeconds: 0
+  - kind: "DeploymentConfig"
+    apiVersion: v1
+    metadata:
+      name: "lumen-nginx"
+      namespace: hkkk
+    spec:
+      template:
+        metadata:
+          labels:
+            name: "lumen-nginx"
+        spec:
+          containers:
+            - name: "lumen-nginx"
+              namespace: hkkk
+              image: "lumen-nginx"
+              ports:
+                - containerPort: 8081
+                  protocol: "TCP"
+      replicas: 1
+      triggers:
+      - type: "ConfigChange"
+      - type: "ImageChange"
+        imageChangeParams:
+          automatic: true
+          containerNames:
+            - "lumen-nginx"
+          from:
+            kind: "ImageStreamTag"
+            name: "lumen-nginx:latest"
+      strategy:
+        type: "Rolling"
+      paused: false
+      revisionHistoryLimit: 2
+      minReadySeconds: 0
+
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      name: lumen-nginx
+      namespace: hkkk
+    spec:
+      ports:
+        - port: 80
+          protocol: TCP
+          targetPort: 8081
+      selector:
+        deploymentconfig: lumen-nginx
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      name: lumen-php
+      namespace: hkkk
+    spec:
+      ports:
+        - port: 9000
+          protocol: TCP
+          targetPort: 9000
+      selector:
+        deploymentconfig: lumen-php
+
+  - kind: Route
+    apiVersion: route.openshift.io/v1
+    metadata:
+      labels:
+        app: lumen-nginx
+      name: lumen-nginx
+      namespace: hkkk
+    spec:
+      port:
+        targetPort: 8081
+      to:
+        kind: Service
+        name: lumen-nginx
+        weight: 100
+      wildcardPolicy: None
+
+
+
